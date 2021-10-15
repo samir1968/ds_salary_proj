@@ -49,7 +49,8 @@ print("\n Linear Regression Score: ",r_cv_score)
 
 # lasso regression
 
-lm_l = Lasso()
+lm_l = Lasso(alpha=0.13)
+lm_l.fit(X_train, y_train)
 l_cv_score = np.mean(cross_val_score(lm_l, X_train, y_train, scoring='neg_mean_absolute_error', cv=3))
 print("\n Lasso Regression Score: ",l_cv_score)
 
@@ -81,5 +82,17 @@ parameters = {'n_estimators':range(10,100,10),'criterion':('mse','mae'), 'max_fe
 gs = GridSearchCV(rf, parameters, scoring='neg_mean_absolute_error',cv=3)
 gs.fit(X_train, y_train)
 print("\n GridSearchCV Best_Score: ",gs.best_score_)
+print(gs.best_estimator_)
 # test ensembles
 
+tpred_lm = lm.predict(X_test)
+tpred_lml = lm_l.predict(X_test)
+tpred_rf = gs.best_estimator_.predict(X_test)
+
+from sklearn.metrics import mean_absolute_error
+
+print(mean_absolute_error(y_test,tpred_lm))
+print(mean_absolute_error(y_test,tpred_lml))
+print(mean_absolute_error(y_test,tpred_rf))
+
+print("\n Score of Linear Regression And RandomForest: ",mean_absolute_error(y_test,(tpred_lm + tpred_rf)/2))
